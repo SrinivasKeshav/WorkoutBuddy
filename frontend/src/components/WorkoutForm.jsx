@@ -1,18 +1,28 @@
 import { useState } from "react";
+import { useWorkoutContext } from "../hooks/useWorkoutContext";
+import { useAuthContext } from "../hooks/useAuthContext";
+
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { useWorkoutContext } from "../hooks/useWorkoutContext";
 
 export default function WorkoutForm() {
+  const { dispatch } = useWorkoutContext();
+  const { user } = useAuthContext();
+
   const [title, setTitle] = useState("");
   const [reps, setReps] = useState("");
   const [load, setLoad] = useState("");
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
-  const { dispatch } = useWorkoutContext();
 
   const handleSubmit = async (evt) => {
     evt.preventDefault();
+
+    if (!user) {
+      setError("You must be logged in");
+      return;
+    }
+
     const workout = { title, reps, load };
 
     const res = await fetch("/api/workouts", {
@@ -20,6 +30,7 @@ export default function WorkoutForm() {
       body: JSON.stringify(workout),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
       },
     });
 

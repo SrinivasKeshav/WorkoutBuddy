@@ -1,13 +1,23 @@
 import { useWorkoutContext } from "../hooks/useWorkoutContext";
+import { useAuthContext } from "../hooks/useAuthContext";
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 
 export default function WorkoutDetails({ workout }) {
   const { dispatch } = useWorkoutContext();
+  const { user } = useAuthContext();
 
   const handleClick = async () => {
+    if (!user) {
+      return;
+    }
+
     const res = await fetch("/api/workouts/" + workout._id, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
     });
     const json = await res.json();
 
@@ -25,7 +35,7 @@ export default function WorkoutDetails({ workout }) {
         {workout.reps}
       </p>
       <p>
-        <strong>load (Kg): </strong>
+        <strong>Load (Kg): </strong>
         {workout.load}
       </p>
       <p>
