@@ -8,6 +8,7 @@ const userRoutes = require('./routes/user')
 const app = express();
 
 //middleware
+app.use(express.static('dist'));
 app.use(express.json())
 
 //routes
